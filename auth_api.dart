@@ -1280,6 +1280,11 @@ class AuthApi {
       final decoded = responseBody.isEmpty
           ? <String, dynamic>{}
           : jsonDecode(responseBody);
+      // Some endpoints (including wallets and withdrawal options) return a
+      // top-level array rather than a data envelope.
+      if (decoded is List && response.statusCode >= 200 && response.statusCode < 300) {
+        return <String, dynamic>{'data': decoded};
+      }
       if (decoded is! Map<String, dynamic>) {
         throw const AuthException('The server returned an invalid response.');
       }
